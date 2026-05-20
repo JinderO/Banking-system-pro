@@ -1,6 +1,7 @@
 package com.jindero.banking.features.user;
 
 
+import com.jindero.banking.features.account.Account;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -39,6 +41,10 @@ public class User {
   private LocalDateTime createdAt;
   @UpdateTimestamp
   private LocalDateTime updatedAt;
+
+  //Propojeni User a Account
+  @OneToMany(mappedBy = "user")
+  private List<Account> accounts;
 
   // Konstruktory
   public User() {

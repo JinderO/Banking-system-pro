@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
+import java.math.BigDecimal;
+
 public class CreateAccountRequest {
 
   @NotNull(message = "User ID is required")
@@ -17,13 +19,13 @@ public class CreateAccountRequest {
 
   @NotNull(message = "Initial balance is required")
   @Positive(message = "Initial balance must be positive")
-  private Double initialBalance;
+  private BigDecimal initialBalance;
 
   //Konstruktor
 
   public CreateAccountRequest() {}
 
-  public CreateAccountRequest(Long userId, String accountType, String accountNumber, Double initialBalance) {
+  public CreateAccountRequest(Long userId, String accountType, String accountNumber, BigDecimal initialBalance) {
     this.userId = userId;
     this.accountType = accountType;
     this.accountNumber = accountNumber;
@@ -56,11 +58,11 @@ public class CreateAccountRequest {
     this.accountNumber = accountNumber;
   }
 
-  public Double getInitialBalance() {
+  public BigDecimal getInitialBalance() {
     return initialBalance;
   }
 
-  public void setInitialBalance(Double initialBalance) {
+  public void setInitialBalance(BigDecimal initialBalance) {
     this.initialBalance = initialBalance;
   }
 }

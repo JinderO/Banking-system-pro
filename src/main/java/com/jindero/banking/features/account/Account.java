@@ -2,8 +2,10 @@ package com.jindero.banking.features.account;
 
 
 import com.jindero.banking.features.user.User;
+import com.jindero.banking.shared.exception.InsufficientFundsException;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -19,7 +21,11 @@ public abstract class Account {
   @Column(unique = true)
   protected String accountNumber;
 
-  protected double balance;
+  protected BigDecimal balance;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "account_type_enum")
+  private AccountType accountType;
 
   //Propojeni Account s User
   @ManyToOne
@@ -28,41 +34,45 @@ public abstract class Account {
 
   //konstruktor
 
-  public Account() {
+  protected Account() {
   }
 
-  public Account( String accountNumber, double balance, User user) {
+  protected Account(String accountNumber, BigDecimal balance, User user,AccountType accountType) {
     this.accountNumber = accountNumber;
     this.balance = balance;
     this.user = user;
+    this.accountType = accountType;
   }
 
-  //Abstract metody
-  public abstract double calculateInterest();
-  public abstract String getAccountType();
 
   //Metody
-  public void deposit(double amount) {
-    if (amount <= 0) {
-       System.out.println("Chyba! Zadej částku větší než 0!");
-       return;
+  public BigDecimal calculate
+
+  public void deposit(BigDecimal amount) {
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+       throw new IllegalArgumentException("Chyba! Zadej částku větší než 0!");
     }
-    balance += amount;
+    balance = balance.add(amount);
     System.out.println("Vloženo: " + amount + " Kč");
   }
 
-  public boolean withdraw(double amount) {
-    if (amount > 0 && balance >= amount) {
-      balance -= amount;
-      System.out.println("Vybráno " + amount + " Kč");
-      return true;
+  public void withdraw(BigDecimal amount) {
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) > 0) {
+      throw new IllegalArgumentException("Částka pro výběr musí být kladná");
     }
-    System.out.println("Nedostatek prostředků");
-    return false;
+    if (balance.compareTo(amount) >= 0) {
+      throw new InsufficientFundsException("Nedostatek peněz na účtě");
+    }
+    balance = balance.subtract(amount);
+    System.out.println("Vybráno " + amount + " Kč");
   }
 
   //Getter
-  public double getBalance(){
+  public AccountType getAccountType() {
+    return accountType;
+  }
+
+  public BigDecimal getBalance(){
     return balance;
   }
 
@@ -78,15 +88,6 @@ public abstract class Account {
     return user;
   }
 
-  //Setter
-
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  public void setUser(User user){
-    this.user = user;
-  }
 
   @Override
   public boolean equals(Object o) {

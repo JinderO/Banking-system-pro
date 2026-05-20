@@ -7,6 +7,7 @@ import com.jindero.banking.shared.exception.AccountNotFoundException;
 import com.jindero.banking.shared.exception.InsufficientFundsException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,16 +25,19 @@ public class AccountService {
   //vytvořit account
 
   public Account createAccount(Long userId,String accountType,
-                               String accountNumber, double initialBalance){
+                               String accountNumber, BigDecimal initialBalance){
 
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
 
-    Account account =  switch (accountType.toUpperCase()){
-      case "SAVINGS" -> new SavingsAccount(accountNumber, initialBalance, user);
-      case "CHECKING" -> new CheckingAccount(accountNumber, initialBalance,user);
-      case "BUSINESS" -> new BusinessAccount(accountNumber, initialBalance,user);
-      default -> throw new IllegalArgumentException("Invalid account type: " + accountType);
+    // Převod String -> enum
+    AccountType type = AccountType.fromString(accountType);
+
+    // Switch podle enum
+    Account account =  switch (type){
+      case SAVINGS -> new SavingsAccount(accountNumber, initialBalance, user);
+      case CHECKING -> new CheckingAccount(accountNumber, initialBalance,user);
+      case BUSINESS -> new BusinessAccount(accountNumber, initialBalance,user);
     };
     return accountRepository.save(account);
   }
@@ -52,8 +56,8 @@ public class AccountService {
   }
 
   // Vložení peněz
-  public Account deposit(Long accountId, double amount){
-    if (amount <= 0){
+  public Account deposit(Long accountId, BigDecimal amount){
+    if (amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Deposit amount must be positive");
     }
 
@@ -67,8 +71,8 @@ public class AccountService {
   }
 
   // Výběr peněz
-  public Account withdraw(Long accountId,double amount){
-    if (amount <= 0){
+  public Account withdraw(Long accountId,BigDecimal amount){
+    if (amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Withdrawal amount must be positive");
     }
 

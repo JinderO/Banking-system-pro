@@ -4,6 +4,9 @@ package com.jindero.banking.features.account;
 import com.jindero.banking.features.user.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import org.hibernate.sql.results.graph.collection.internal.BagInitializer;
+
+import java.math.BigDecimal;
 
 @Entity
 @DiscriminatorValue("BUSINESS")
@@ -11,18 +14,14 @@ public class BusinessAccount extends Account implements Chargeable {
 
   //Konstruktor
 
-  public BusinessAccount(){
+  protected BusinessAccount(){
     super();
   }
 
-  public BusinessAccount(String accountNumber, double balance, User user) {
-    super(accountNumber, balance, user);
+  protected BusinessAccount(String accountNumber, BigDecimal balance, User user) {
+    super(accountNumber, balance, user, AccountType.BUSINESS);
   }
 
-  @Override
-  public double calculateInterest() {
-    return balance * 0.01;
-  }
 
   @Override
   public String getAccountType() {

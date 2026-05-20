@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,13 +54,13 @@ public class AccountController {
 
   // POST /api/accounts/1/deposit?amount=500
   @PostMapping("/{id}/deposit")
-  public Account deposit(@PathVariable Long id, @RequestParam double amount){
+  public Account deposit(@PathVariable Long id, @RequestParam BigDecimal amount){
     return accountService.deposit(id, amount);
   }
 
   // POST /api/accounts/1/deposit?amount=200
   @PostMapping("/{id}/withdraw")
-  public Account withdraw(@PathVariable Long id, @RequestParam double amount){
+  public Account withdraw(@PathVariable Long id, @RequestParam BigDecimal amount){
     return accountService.withdraw(id, amount);
   }
 
