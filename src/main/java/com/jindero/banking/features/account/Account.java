@@ -46,25 +46,27 @@ public abstract class Account {
 
 
   //Metody
-  public BigDecimal calculate
+  public BigDecimal calculateInterest() {
+    return accountType.calculateMonthlyInterest(balance);
+  }
 
   public void deposit(BigDecimal amount) {
     if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-       throw new IllegalArgumentException("Chyba! Zadej částku větší než 0!");
+       throw new IllegalArgumentException("Error! Deposit amount bigger than 0!");
     }
     balance = balance.add(amount);
-    System.out.println("Vloženo: " + amount + " Kč");
+    System.out.println("Deposit: " + amount + " Kč");
   }
 
   public void withdraw(BigDecimal amount) {
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) > 0) {
-      throw new IllegalArgumentException("Částka pro výběr musí být kladná");
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Withdrawal amount must be positive");
     }
-    if (balance.compareTo(amount) >= 0) {
-      throw new InsufficientFundsException("Nedostatek peněz na účtě");
+    if (balance.compareTo(amount) < 0) {
+      throw new InsufficientFundsException("Insufficient funds");
     }
     balance = balance.subtract(amount);
-    System.out.println("Vybráno " + amount + " Kč");
+    System.out.println("Withdrawn " + amount + " Kč");
   }
 
   //Getter
@@ -107,6 +109,7 @@ public abstract class Account {
             "id=" + id +
             ", accountNumber='" + accountNumber + '\'' +
             ", balance=" + balance +
+            ", accountType=" + accountType +
             ", user=" + user +
             '}';
   }

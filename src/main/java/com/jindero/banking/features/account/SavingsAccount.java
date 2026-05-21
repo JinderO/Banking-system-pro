@@ -20,10 +20,4 @@ public class SavingsAccount extends Account {
   protected SavingsAccount(String accountNumber, BigDecimal balance, User user) {
     super(accountNumber, balance, user, AccountType.SAVINGS);
   }
-
-
-  @Override
-  public String getAccountType() {
-    return "Savings Account";
-  }
 }

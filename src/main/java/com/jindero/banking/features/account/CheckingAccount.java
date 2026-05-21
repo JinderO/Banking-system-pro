@@ -22,26 +22,14 @@ public class CheckingAccount extends Account implements Chargeable {
   }
 
   @Override
-  public double calculateInterest() {
-    return balance * 0.005;
-  }
-
-  @Override
-  public String getAccountType() {
-    return "Checking Account";
-  }
-
-
-  @Override
-  public double calculateFees() {
-    double fees = 50.00;
-    return fees;
+  public BigDecimal calculateFees() {
+    return new BigDecimal("50.00");
   }
 
   @Override
   public void applyMonthlyFee() {
-    double fees = calculateFees();
-    balance -= fees;
-    System.out.println("Odečteno " + fees + " z účtu " + accountNumber);
+    BigDecimal fees = calculateFees();
+    balance = balance.subtract(calculateFees());
+    System.out.println("Deducted " + fees + " from account " + accountNumber);
   }
 }

@@ -4,7 +4,6 @@ package com.jindero.banking.features.account;
 import com.jindero.banking.features.user.User;
 import com.jindero.banking.features.user.UserRepository;
 import com.jindero.banking.shared.exception.AccountNotFoundException;
-import com.jindero.banking.shared.exception.InsufficientFundsException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -57,34 +56,35 @@ public class AccountService {
 
   // Vložení peněz
   public Account deposit(Long accountId, BigDecimal amount){
+    // Validace částky
     if (amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Deposit amount must be positive");
     }
-
-    Optional<Account> accountOpt = accountRepository.findById(accountId);
-    if (accountOpt.isPresent()){
-      Account account = accountOpt.get();
+    // Najdi účet
+    Account account = accountRepository.findById(accountId)
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + accountId + " not found"));
+    // Vložení
       account.deposit(amount);
+    // Uložení
       return accountRepository.save(account);
-    }
-    throw new AccountNotFoundException("Account with ID " + accountId + " not found");
-  }
+      }
+
 
   // Výběr peněz
   public Account withdraw(Long accountId,BigDecimal amount){
-    if (amount.compareTo(BigDecimal.ZERO) <= 0){
+    // Validace částky
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Withdrawal amount must be positive");
     }
+    // Najdi účet
+    Account account = accountRepository.findById(accountId)
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID "+ accountId+ " not found"));
 
-    Optional<Account> accountOpt = accountRepository.findById(accountId);
-    if (accountOpt.isPresent()){
-      Account account = accountOpt.get();
-      if (account.withdraw(amount)){
-        return accountRepository.save(account);
+    account.withdraw(amount);
+
+    return accountRepository.save(account);
       }
-      throw  new InsufficientFundsException("Insufficient funds for withdrawal of " + amount);
-    }
-    throw new AccountNotFoundException("Account with ID "+ accountId+ " not found");
-  }
-
 }
+
+
+
