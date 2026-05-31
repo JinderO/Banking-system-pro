@@ -29,7 +29,7 @@ public class BusinessAccount extends Account implements Chargeable {
   @Override
   public void applyMonthlyFee() {
     BigDecimal fees = calculateFees();
-    balance = balance.subtract(calculateFees());
+    balance = balance.subtract(fees);
     System.out.println("Deducted " + fees + " from account " + accountNumber);
   }
 }

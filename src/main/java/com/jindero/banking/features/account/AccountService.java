@@ -4,6 +4,7 @@ package com.jindero.banking.features.account;
 import com.jindero.banking.features.user.User;
 import com.jindero.banking.features.user.UserRepository;
 import com.jindero.banking.shared.exception.AccountNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,8 +22,8 @@ public class AccountService {
     this.userRepository = userRepository;
   }
 
-  //vytvořit account
-
+  //Vytvořit account
+@Transactional
   public Account createAccount(Long userId,String accountType,
                                String accountNumber, BigDecimal initialBalance){
 
@@ -55,6 +56,7 @@ public class AccountService {
   }
 
   // Vložení peněz
+  @Transactional
   public Account deposit(Long accountId, BigDecimal amount){
     // Validace částky
     if (amount.compareTo(BigDecimal.ZERO) <= 0){
@@ -71,6 +73,7 @@ public class AccountService {
 
 
   // Výběr peněz
+  @Transactional
   public Account withdraw(Long accountId,BigDecimal amount){
     // Validace částky
     if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
