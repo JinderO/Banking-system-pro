@@ -12,6 +12,7 @@ public enum AccountType {
   private final BigDecimal interestRate;
   private final BigDecimal monthlyFee;
 
+  //Konstruktor
   AccountType(BigDecimal interestRate, BigDecimal monthlyFee){
     this.interestRate = interestRate;
     this.monthlyFee = monthlyFee;
