@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -24,7 +25,7 @@ public class AccountService {
 
   //Vytvořit account
 @Transactional
-  public Account createAccount(Long userId,String accountType,
+  public Account createAccount(UUID userId,String accountType,
                                String accountNumber, BigDecimal initialBalance){
 
     User user = userRepository.findById(userId)
@@ -48,8 +49,8 @@ public class AccountService {
   }
 
   // Najít účet pomocí ID
-  public Optional<Account> getAccountById(Long id){
-    if (id == null || id <= 0){
+  public Optional<Account> getAccountById(UUID id){
+    if (id == null){
       return Optional.empty();
     }
     return accountRepository.findById(id);
@@ -57,7 +58,7 @@ public class AccountService {
 
   // Vložení peněz
   @Transactional
-  public Account deposit(Long accountId, BigDecimal amount){
+  public Account deposit(UUID accountId, BigDecimal amount){
     // Validace částky
     if (amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Deposit amount must be positive");
@@ -74,7 +75,7 @@ public class AccountService {
 
   // Výběr peněz
   @Transactional
-  public Account withdraw(Long accountId,BigDecimal amount){
+  public Account withdraw(UUID accountId,BigDecimal amount){
     // Validace částky
     if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
       throw new IllegalArgumentException("Withdrawal amount must be positive");

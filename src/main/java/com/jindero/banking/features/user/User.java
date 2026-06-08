@@ -12,14 +12,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "users")
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  protected Long id;
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
   @NotNull
   @NotBlank(message = "Must be filled")
@@ -50,7 +51,7 @@ public class User {
   public User() {
   }
 
-  public User(Long id, String firstName, String lastName, String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public User(UUID id, String firstName, String lastName, String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -61,7 +62,7 @@ public class User {
   }
 
   //Getters
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
