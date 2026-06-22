@@ -15,8 +15,8 @@ import java.util.UUID;
 @Service
 public class AccountService {
 
-  private AccountRepository accountRepository;
-  private UserRepository userRepository;
+  private final AccountRepository accountRepository;
+  private final UserRepository userRepository;
 
   public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
     this.accountRepository = accountRepository;
@@ -44,11 +44,13 @@ public class AccountService {
   }
 
   // Zobrazit všechny učty
+  @Transactional(readOnly = true)
   public List<Account> getAllAccounts(){
     return accountRepository.findAll();
   }
 
   // Najít účet pomocí ID
+  @Transactional(readOnly = true)
   public Optional<Account> getAccountById(UUID id){
     if (id == null){
       return Optional.empty();

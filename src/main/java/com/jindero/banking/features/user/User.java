@@ -51,8 +51,7 @@ public class User {
   public User() {
   }
 
-  public User(UUID id, String firstName, String lastName, String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
-    this.id = id;
+  public User(String firstName, String lastName, String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;

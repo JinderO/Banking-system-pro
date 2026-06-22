@@ -55,7 +55,6 @@ public class Transaction {
   //Konstruktery
   protected Transaction() {
   }
-
   public Transaction(Account accountFrom, Account accountTo, BigDecimal amount,
                      TransactionType type, String variableSymbol,
                      String specificSymbol, String note) {
@@ -67,6 +66,7 @@ public class Transaction {
     this.variableSymbol = variableSymbol;
     this.specificSymbol = specificSymbol;
     this.note = note;
+
   }
 
   public Transaction(Account accountFrom, Account accountTo, BigDecimal amount,
