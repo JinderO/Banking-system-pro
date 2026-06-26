@@ -17,7 +17,7 @@ import java.util.UUID;
 public class AccountController {
 
 
-  private AccountService accountService;
+  private final AccountService accountService;
 
   public AccountController(AccountService accountService) {
     this.accountService = accountService;
@@ -44,10 +44,10 @@ public class AccountController {
   @PostMapping
   public ResponseEntity<Account> createAccount(@Valid @RequestBody CreateAccountRequest request){
     Account account = accountService.createAccount(
-            request.getUserId(),
-            request.getAccountType(),
-            request.getAccountNumber(),
-            request.getInitialBalance()
+            request.userId(),
+            request.accountType(),
+            request.accountNumber(),
+            request.initialBalance()
     );
     return ResponseEntity.status(HttpStatus.CREATED).body(account);
 
