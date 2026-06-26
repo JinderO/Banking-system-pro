@@ -21,11 +21,11 @@ public class Transaction {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @ManyToOne (optional = false)
+  @ManyToOne (optional = true)
   @JoinColumn(name = "account_from_id")
   private Account accountFrom;
 
-  @ManyToOne (optional = false)
+  @ManyToOne (optional = true)
   @JoinColumn(name = "account_to_id")
   private Account accountTo;
 
@@ -131,8 +131,8 @@ public class Transaction {
   //Metoda
 
   public static Transaction forTransfer(Account accountFrom, Account accountTo,
-                                        BigDecimal ammount){
-    return new Transaction(accountFrom,accountTo,ammount,TransactionType.TRANSFER);
+                                        BigDecimal amount){
+    return new Transaction(accountFrom,accountTo,amount,TransactionType.TRANSFER);
   }
 
   public static Transaction forDeposit(Account accountTo, BigDecimal amount){

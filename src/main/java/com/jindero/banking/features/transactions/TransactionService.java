@@ -60,9 +60,8 @@ public class TransactionService {
 
     // Transakce
     Transaction transaction = Transaction.forTransfer(senderAccount, receiverAccount, request.amount());
-    transactionRepository.save(transaction);
-
-    return TransactionResponse.from(transaction);
+    Transaction saved = transactionRepository.save(transaction);
+    return TransactionResponse.from(saved);
   }
 
   //Vložení peněz
@@ -81,9 +80,8 @@ public class TransactionService {
 
     // Transakce
     Transaction transaction = Transaction.forDeposit(receiverAccount, request.amount());
-    transactionRepository.save(transaction);
-
-    return TransactionResponse.from(transaction);
+    Transaction saved = transactionRepository.save(transaction);
+    return TransactionResponse.from(saved);
   }
 
     //Výběr peněz
@@ -106,9 +104,8 @@ public class TransactionService {
 
       // Transakce
       Transaction transaction = Transaction.forWithdrawal(senderAccount, request.amount());
-      transactionRepository.save(transaction);
-
-      return TransactionResponse.from(transaction);
+      Transaction saved = transactionRepository.save(transaction);
+      return TransactionResponse.from(saved);
 
     }
 
