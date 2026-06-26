@@ -130,6 +130,19 @@ public class Transaction {
 
   //Metoda
 
+  public static Transaction forTransfer(Account accountFrom, Account accountTo,
+                                        BigDecimal ammount){
+    return new Transaction(accountFrom,accountTo,ammount,TransactionType.TRANSFER);
+  }
+
+  public static Transaction forDeposit(Account accountTo, BigDecimal amount){
+    return new Transaction(null, accountTo,amount,TransactionType.DEPOSIT);
+  }
+
+  public static Transaction forWithdrawal(Account accountFrom, BigDecimal amount){
+    return new Transaction(accountFrom,null,amount,TransactionType.WITHDRAWAL);
+  }
+
   @Override
   public String toString(){
     return "Transaction{" +

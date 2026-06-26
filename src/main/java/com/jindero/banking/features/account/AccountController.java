@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -30,7 +31,7 @@ public class AccountController {
 
   // GET /api/accounts/{id} - jeden účet
   @GetMapping("/{id}")
-  public ResponseEntity<Account> getAccountById(@PathVariable Long id){
+  public ResponseEntity<Account> getAccountById(@PathVariable UUID id){
     Optional<Account> account = accountService.getAccountById(id);
     if (account.isPresent()){
       return ResponseEntity.ok(account.get());
@@ -54,13 +55,13 @@ public class AccountController {
 
   // POST /api/accounts/1/deposit?amount=500
   @PostMapping("/{id}/deposit")
-  public Account deposit(@PathVariable Long id, @RequestParam BigDecimal amount){
+  public Account deposit(@PathVariable UUID id, @RequestParam BigDecimal amount){
     return accountService.deposit(id, amount);
   }
 
   // POST /api/accounts/1/deposit?amount=200
   @PostMapping("/{id}/withdraw")
-  public Account withdraw(@PathVariable Long id, @RequestParam BigDecimal amount){
+  public Account withdraw(@PathVariable UUID id, @RequestParam BigDecimal amount){
     return accountService.withdraw(id, amount);
   }
 

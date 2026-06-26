@@ -2,30 +2,38 @@
 package com.jindero.banking.features.transactions;
 
 import com.jindero.banking.features.account.Account;
-import com.jindero.banking.features.account.AccountRepository;
 import com.jindero.banking.features.account.AccountService;
 import com.jindero.banking.features.transactions.dto.CreateTransactionRequest;
 import com.jindero.banking.features.transactions.dto.TransactionResponse;
 import com.jindero.banking.shared.exception.AccountNotFoundException;
+import com.jindero.banking.shared.exception.InsufficientFundsException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 public class TransactionService {
 
-  private final AccountRepository accountRepository;
+
   private final TransactionRepository transactionRepository;
   private final AccountService accountService;
 
   //Konstruktor
-  public TransactionService(AccountRepository accountRepository, TransactionRepository transactionRepository,
+  public TransactionService( TransactionRepository transactionRepository,
                             AccountService accountService){
-    this.accountRepository = accountRepository;
+
     this.transactionRepository = transactionRepository;
     this.accountService = accountService;
   }
 
-  //Vytvoření transakce
+  //Poslání peněz
+  @Transactional
   public TransactionResponse transfer(CreateTransactionRequest request){
+
+    //Kontrola amount
+    validateAmount(request.amount());
+
     //Načtení účtu odesílatele
     Account senderAccount = accountService.getAccountById(request.fromAccountId())
             .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.fromAccountId() + " not found"));
@@ -39,29 +47,83 @@ public class TransactionService {
       throw new IllegalArgumentException("Sender and receiver accounts must be different.");
     }
 
+    //Kontrola vůči zůstatku
+    if (request.amount().compareTo(senderAccount.getBalance())>0){
+      throw new InsufficientFundsException("Insufficient funds on the source account.");
+    }
 
+    //Odečtení peněz odesílateli
+    accountService.withdraw(senderAccount.getId(), request.amount());
 
-
-
-
-    //Deposit
-    Account deposit = accountService.deposit(request.toAccountId(),request.amount());
+    //Připsání peněz příjemci
+    accountService.deposit(receiverAccount.getId(),request.amount());
 
     // Transakce
-    Transaction transaction = new Transaction(senderAccount, receiverAccount, request.amount(), TransactionType.DEPOSIT);
-
+    Transaction transaction = Transaction.forTransfer(senderAccount, receiverAccount, request.amount());
+    transactionRepository.save(transaction);
 
     return TransactionResponse.from(transaction);
   }
 
-  //Vložení
+  //Vložení peněz
+  @Transactional
+  public TransactionResponse deposit(CreateTransactionRequest request) {
 
-  //Výběr
+    //Kontrola amount
+    validateAmount(request.amount());
+
+    //Načtení účtu příjemce
+    Account receiverAccount = accountService.getAccountById(request.toAccountId())
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.toAccountId() + " not found"));
+
+
+    accountService.deposit(receiverAccount.getId(), request.amount());
+
+    // Transakce
+    Transaction transaction = Transaction.forDeposit(receiverAccount, request.amount());
+    transactionRepository.save(transaction);
+
+    return TransactionResponse.from(transaction);
+  }
+
+    //Výběr peněz
+    @Transactional
+    public TransactionResponse withdrawal(CreateTransactionRequest request) {
+
+      //Kontrola amount
+      validateAmount(request.amount());
+
+    //Načtení účtu
+      Account senderAccount = accountService.getAccountById(request.fromAccountId())
+              .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.fromAccountId() + " not found"));
+
+      //Kontrola vůči zůstatku
+      if (request.amount().compareTo(senderAccount.getBalance())>0){
+        throw new InsufficientFundsException("Insufficient funds on the source account.");
+      }
+
+      accountService.withdraw(senderAccount.getId(), request.amount());
+
+      // Transakce
+      Transaction transaction = Transaction.forWithdrawal(senderAccount, request.amount());
+      transactionRepository.save(transaction);
+
+      return TransactionResponse.from(transaction);
+
+    }
+
 
   //Najít všechny transakce z mého ůčtu
 
   //Najít transakce od do
 
   //Najít transakce od do teď
+
+  // Helper metody
+  private void validateAmount(BigDecimal amount){
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
+      throw new IllegalArgumentException("Transaction amount must be greater than zero.");
+    }
+  }
 
 }
