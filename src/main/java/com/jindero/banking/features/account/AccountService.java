@@ -24,9 +24,9 @@ public class AccountService {
   }
 
   //Vytvořit account
-@Transactional
-  public Account createAccount(UUID userId,String accountType,
-                               String accountNumber, BigDecimal initialBalance){
+  @Transactional
+  public Account createAccount(UUID userId, String accountType,
+                               String accountNumber, BigDecimal initialBalance) {
 
     User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
@@ -35,24 +35,24 @@ public class AccountService {
     AccountType type = AccountType.fromString(accountType);
 
     // Switch podle enum
-    Account account =  switch (type){
+    Account account = switch (type) {
       case SAVINGS -> new SavingsAccount(accountNumber, initialBalance, user);
-      case CHECKING -> new CheckingAccount(accountNumber, initialBalance,user);
-      case BUSINESS -> new BusinessAccount(accountNumber, initialBalance,user);
+      case CHECKING -> new CheckingAccount(accountNumber, initialBalance, user);
+      case BUSINESS -> new BusinessAccount(accountNumber, initialBalance, user);
     };
     return accountRepository.save(account);
   }
 
   // Zobrazit všechny učty
   @Transactional(readOnly = true)
-  public List<Account> getAllAccounts(){
+  public List<Account> getAllAccounts() {
     return accountRepository.findAll();
   }
 
   // Najít účet pomocí ID
   @Transactional(readOnly = true)
-  public Optional<Account> getAccountById(UUID id){
-    if (id == null){
+  public Optional<Account> getAccountById(UUID id) {
+    if (id == null) {
       return Optional.empty();
     }
     return accountRepository.findById(id);
@@ -60,31 +60,31 @@ public class AccountService {
 
   // Vložení peněz
   @Transactional
-  public Account deposit(UUID accountId, BigDecimal amount){
+  public Account deposit(UUID accountId, BigDecimal amount) {
     // Validace částky
-    if (amount.compareTo(BigDecimal.ZERO) <= 0){
+    if (amount.compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Deposit amount must be positive");
     }
     // Najdi účet
     Account account = accountRepository.findById(accountId)
             .orElseThrow(() -> new AccountNotFoundException("Account with ID " + accountId + " not found"));
     // Vložení
-      account.deposit(amount);
+    account.deposit(amount);
     // Uložení
-      return accountRepository.save(account);
-      }
+    return accountRepository.save(account);
+  }
 
 
   // Výběr peněz
   @Transactional
-  public Account withdraw(UUID accountId,BigDecimal amount){
+  public Account withdraw(UUID accountId, BigDecimal amount) {
     // Validace částky
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Withdrawal amount must be positive");
     }
     // Najdi účet
     Account account = accountRepository.findById(accountId)
-            .orElseThrow(() -> new AccountNotFoundException("Account with ID "+ accountId+ " not found"));
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + accountId + " not found"));
 
     account.withdraw(amount);
 

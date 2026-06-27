@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TransactionService {
@@ -20,8 +23,8 @@ public class TransactionService {
   private final AccountService accountService;
 
   //Konstruktor
-  public TransactionService( TransactionRepository transactionRepository,
-                            AccountService accountService){
+  public TransactionService(TransactionRepository transactionRepository,
+                            AccountService accountService) {
 
     this.transactionRepository = transactionRepository;
     this.accountService = accountService;
@@ -29,7 +32,7 @@ public class TransactionService {
 
   //Poslání peněz
   @Transactional
-  public TransactionResponse transfer(CreateTransactionRequest request){
+  public TransactionResponse transfer(CreateTransactionRequest request) {
 
     //Kontrola amount
     validateAmount(request.amount());
@@ -43,12 +46,12 @@ public class TransactionService {
             .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.toAccountId() + " not found"));
 
     //Porovnání zda odesílatel a příjemce není jeden účet
-    if (senderAccount.equals(receiverAccount)){
+    if (senderAccount.equals(receiverAccount)) {
       throw new IllegalArgumentException("Sender and receiver accounts must be different.");
     }
 
     //Kontrola vůči zůstatku
-    if (request.amount().compareTo(senderAccount.getBalance())>0){
+    if (request.amount().compareTo(senderAccount.getBalance()) > 0) {
       throw new InsufficientFundsException("Insufficient funds on the source account.");
     }
 
@@ -56,7 +59,7 @@ public class TransactionService {
     accountService.withdraw(senderAccount.getId(), request.amount());
 
     //Připsání peněz příjemci
-    accountService.deposit(receiverAccount.getId(),request.amount());
+    accountService.deposit(receiverAccount.getId(), request.amount());
 
     // Transakce
     Transaction transaction = Transaction.forTransfer(senderAccount, receiverAccount, request.amount());
@@ -84,41 +87,61 @@ public class TransactionService {
     return TransactionResponse.from(saved);
   }
 
-    //Výběr peněz
-    @Transactional
-    public TransactionResponse withdrawal(CreateTransactionRequest request) {
+  //Výběr peněz
+  @Transactional
+  public TransactionResponse withdrawal(CreateTransactionRequest request) {
 
-      //Kontrola amount
-      validateAmount(request.amount());
+    //Kontrola amount
+    validateAmount(request.amount());
 
     //Načtení účtu
-      Account senderAccount = accountService.getAccountById(request.fromAccountId())
-              .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.fromAccountId() + " not found"));
+    Account senderAccount = accountService.getAccountById(request.fromAccountId())
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + request.fromAccountId() + " not found"));
 
-      //Kontrola vůči zůstatku
-      if (request.amount().compareTo(senderAccount.getBalance())>0){
-        throw new InsufficientFundsException("Insufficient funds on the source account.");
-      }
-
-      accountService.withdraw(senderAccount.getId(), request.amount());
-
-      // Transakce
-      Transaction transaction = Transaction.forWithdrawal(senderAccount, request.amount());
-      Transaction saved = transactionRepository.save(transaction);
-      return TransactionResponse.from(saved);
-
+    //Kontrola vůči zůstatku
+    if (request.amount().compareTo(senderAccount.getBalance()) > 0) {
+      throw new InsufficientFundsException("Insufficient funds on the source account.");
     }
 
+    accountService.withdraw(senderAccount.getId(), request.amount());
 
-  //Najít všechny transakce z mého ůčtu
+    // Transakce
+    Transaction transaction = Transaction.forWithdrawal(senderAccount, request.amount());
+    Transaction saved = transactionRepository.save(transaction);
+    return TransactionResponse.from(saved);
+  }
+
+  //Najít všechny transakce z mého účtu
+  @Transactional(readOnly = true)
+  public List<TransactionResponse> getHistoryByAccount(UUID accountId) {
+    Account account = accountService.getAccountById(accountId)
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + accountId + " not found"));
+    return transactionRepository.findByAccountFromOrAccountTo(account, account)
+            .stream()
+            .map(TransactionResponse::from)
+            .toList();
+  }
 
   //Najít transakce od do
+  @Transactional(readOnly = true)
+  public List<TransactionResponse> getHistoryByDateRange(UUID accountId, LocalDateTime start, LocalDateTime end) {
+    Account account = accountService.getAccountById(accountId)
+            .orElseThrow(() -> new AccountNotFoundException("Account with ID " + accountId + " not found"));
+    return transactionRepository.findHistory(account, start, end)
+            .stream()
+            .map(TransactionResponse::from)
+            .toList();
+  }
 
   //Najít transakce od do teď
+  @Transactional(readOnly = true)
+  public List<TransactionResponse> getHistoryFromDateToNow(UUID accountId, LocalDateTime start) {
+    return getHistoryByDateRange(accountId, start, LocalDateTime.now());
+  }
 
   // Helper metody
-  private void validateAmount(BigDecimal amount){
-    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0){
+  private void validateAmount(BigDecimal amount) {
+    if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Transaction amount must be greater than zero.");
     }
   }

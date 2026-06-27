@@ -12,10 +12,10 @@ import java.util.UUID;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
   //Najít podle odesílatele
-  List<Transaction> findByAccountFrom(Account account);
+ // List<Transaction> findByAccountFrom(Account account);
 
   //Najít podle příjemce
-  List<Transaction> findByAccountTo(Account account);
+ // List<Transaction> findByAccountTo(Account account);
 
   //Najít pokud je účet odesílatelem nebo příjemcem
   List<Transaction> findByAccountFromOrAccountTo(Account accountFrom, Account accountTo);
