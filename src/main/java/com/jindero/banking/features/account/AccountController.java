@@ -53,16 +53,4 @@ public class AccountController {
 
   }
 
-  // POST /api/accounts/1/deposit?amount=500
-  @PostMapping("/{id}/deposit")
-  public Account deposit(@PathVariable UUID id, @RequestParam BigDecimal amount){
-    return accountService.deposit(id, amount);
-  }
-
-  // POST /api/accounts/1/deposit?amount=200
-  @PostMapping("/{id}/withdraw")
-  public Account withdraw(@PathVariable UUID id, @RequestParam BigDecimal amount){
-    return accountService.withdraw(id, amount);
-  }
-
 }
