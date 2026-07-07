@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,5 +47,19 @@ public class TransactionController {
   public List<TransactionResponse> getHistory(@RequestParam UUID accountId) {
     return transactionService.getHistoryByAccount(accountId);
   }
+
+  //GET /api/transactions/history/range
+  @GetMapping("/history/range")
+  public List<TransactionResponse> getHistoryByDateRange(@RequestParam UUID accountId,
+                                                         @RequestParam LocalDateTime start,
+                                                         @RequestParam LocalDateTime end) {
+    return transactionService.getHistoryByDateRange(accountId, start, end);
+  }
+    //GET /api/transactions/history/from
+    @GetMapping("/history/from")
+    public List<TransactionResponse> getHistoryFromDateToNow(@RequestParam UUID accountId,
+                                                             @RequestParam LocalDateTime start){
+      return transactionService.getHistoryFromDateToNow(accountId,start);
+    }
 
 }
