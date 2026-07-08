@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
 
     // Metoda pro ošetření InsufficientFundsException
     @ExceptionHandler(InsufficientFundsException.class)
-    public ResponseEntity<ErrorResponse> InsufficientFundsException (InsufficientFundsException ex){
+    public ResponseEntity<ErrorResponse> handleInsufficientFundsException (InsufficientFundsException ex){
         ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
