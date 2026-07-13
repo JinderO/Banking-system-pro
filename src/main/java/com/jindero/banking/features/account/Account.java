@@ -16,7 +16,7 @@ import java.util.UUID;
 public abstract class Account {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
   @Column(unique = true)
