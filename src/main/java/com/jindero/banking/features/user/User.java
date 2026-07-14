@@ -22,6 +22,9 @@ public class User {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @Column(nullable = false)
+  private String password;
+
   @NotNull
   @NotBlank(message = "Must be filled")
   private String firstName;
@@ -51,9 +54,10 @@ public class User {
   public User() {
   }
 
-  public User(String firstName, String lastName, String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
+  public User(String firstName, String lastName, String password,String email, String phoneNumber, LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.firstName = firstName;
     this.lastName = lastName;
+    this.password = password;
     this.email = email;
     this.phoneNumber = phoneNumber;
     this.createdAt = createdAt;
@@ -64,6 +68,8 @@ public class User {
   public UUID getId() {
     return id;
   }
+
+  public String getPassword() { return password; }
 
   public String getFirstName() {
     return firstName;
@@ -93,6 +99,8 @@ public class User {
   public void setFirstName(String firstName) {
     this.firstName = firstName;
   }
+
+  public void setPassword(String password) { this.password = password;}
 
   public void setLastName(String lastName) {
     this.lastName = lastName;
