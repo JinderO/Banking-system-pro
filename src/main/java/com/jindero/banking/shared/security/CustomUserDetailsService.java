@@ -1,6 +1,5 @@
 package com.jindero.banking.shared.security;
 
-import com.jindero.banking.features.user.User;
 import com.jindero.banking.features.user.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

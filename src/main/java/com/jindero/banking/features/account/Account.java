@@ -4,6 +4,8 @@ package com.jindero.banking.features.account;
 import com.jindero.banking.features.user.User;
 import com.jindero.banking.shared.exception.InsufficientFundsException;
 import jakarta.persistence.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -14,6 +16,8 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "account_type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Account {
+
+  private static final Logger log = LoggerFactory.getLogger(Account.class);
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -56,7 +60,7 @@ public abstract class Account {
        throw new IllegalArgumentException("Error! Deposit amount bigger than 0!");
     }
     balance = balance.add(amount);
-    System.out.println("Deposit: " + amount + " Kč");
+    log.info("Deposit: {} Kč", amount);
   }
 
   public void withdraw(BigDecimal amount) {
@@ -67,7 +71,7 @@ public abstract class Account {
       throw new InsufficientFundsException("Insufficient funds");
     }
     balance = balance.subtract(amount);
-    System.out.println("Withdrawn " + amount + " Kč");
+    log.info("Withdrawn {} Kč", amount);
   }
 
   //Getter
