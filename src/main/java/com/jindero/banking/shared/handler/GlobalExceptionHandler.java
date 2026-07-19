@@ -51,11 +51,17 @@ public class GlobalExceptionHandler {
         return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    // Metoda pro ověření existence uživatele
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException (UserNotFoundException  ex){
+        ErrorResponse response = ErrorResponse.of(HttpStatus.NOT_FOUND,ex);
+        return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     // Metoda pro ošetření Exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException (Exception ex){
         ErrorResponse response = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR,ex);
         return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
-
 }

@@ -1,7 +1,9 @@
 package com.jindero.banking.features.user;
 
 import com.jindero.banking.shared.exception.EmailAlreadyExistException;
+import com.jindero.banking.shared.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,7 @@ private final UserRepository userRepository;
   }
 
   // Vytvořit User
+  @Transactional
   public User createUser(User user)  {
     if (userRepository.existsByEmail(user.getEmail())){
       throw new EmailAlreadyExistException("Email " + user.getEmail() + " already exists");
@@ -49,35 +52,35 @@ private final UserRepository userRepository;
     }
   }
 
-  //Update User
-  public User updateUser( UUID id, User newUserData){
+  @Transactional
+  public User updateUser(UUID id, User newUserData) {
 
-    User existingUser = userRepository.findById(id).get();
+    // Hledá uživatele – pokud neexistuje, vyhodí exception
+    User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
 
-    if (userRepository.existsById(id)){
-      if (!existingUser.getEmail().equals(newUserData.getEmail()) &&
-              userRepository.existsByEmail(newUserData.getEmail())){
-        throw new EmailAlreadyExistException("Email " + newUserData.getEmail() + " already exists");
-      }
-
-      existingUser.setFirstName(newUserData.getFirstName());
-      existingUser.setLastName(newUserData.getLastName());
-      existingUser.setPhoneNumber(newUserData.getPhoneNumber());
-      existingUser.setEmail(newUserData.getEmail());
-
-      return userRepository.save(existingUser);
-    } else {
-      throw new RuntimeException("User with ID " + id + " not found");
+    // KOntrola email - konflikt pouze pokud se email mění
+    if (!existingUser.getEmail().equals(newUserData.getEmail()) &&
+            userRepository.existsByEmail(newUserData.getEmail())) {
+      throw new EmailAlreadyExistException("Email " + newUserData.getEmail() + " already exists");
     }
+
+    existingUser.setFirstName(newUserData.getFirstName());
+    existingUser.setLastName(newUserData.getLastName());
+    existingUser.setPhoneNumber(newUserData.getPhoneNumber());
+    existingUser.setEmail(newUserData.getEmail());
+
+    return userRepository.save(existingUser);
   }
 
   //Smazat User
+  @Transactional
   public void deleteUser(UUID id){
     if (userRepository.existsById(id)){
 
       userRepository.deleteById(id);
     } else {
-      throw new RuntimeException("User with ID "+ id + " not found");
+      throw new UserNotFoundException("User with ID "+ id + " not found");
     }
   }
 
