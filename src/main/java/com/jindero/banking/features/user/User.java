@@ -1,6 +1,7 @@
 package com.jindero.banking.features.user;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jindero.banking.features.account.Account;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -25,6 +26,7 @@ public class User implements UserDetails {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @JsonIgnore
   @Column(nullable = false)
   private String password;
 
